@@ -2,7 +2,7 @@
 Description=Huawei MODBUS -> MQTT Bridge
 
 [Service]
-ExecStart=/usr/bin/node /home/pi/proj/smarthome/huawei2mqtt/index.js -d -p /dev/ttySC1 -c michelMQTT -a 1 -a 2 -t ET -t DT
+ExecStart=/usr/bin/node /home/pi/proj/smarthome/huawei2mqtt/index.js -d -c huaweiMQTT -i lwip
 WorkingDirectory=/home/pi/proj/smarthome/huawei2mqtt
 Restart=always
 RestartSec=1
