@@ -6,7 +6,7 @@ const commandLineArgs = require('command-line-args')
 
 const optionDefinitions = [
 	{ name: 'mqtthost', alias: 'm', type: String, defaultValue: "localhost" },
-	{ name: 'mqttclientid', alias: 'c', type: String, defaultValue: "goodwe1Client" },
+	{ name: 'mqttclientid', alias: 'c', type: String, defaultValue: "huawei1Client" },
 	{ name: 'inverterhost', alias: 'i', type: String},
 	{ name: 'inverterport', alias: 'p', type: String},
         { name: 'address',      alias: 'a', type: Number, multiple: true, defaultValue: [1] },
