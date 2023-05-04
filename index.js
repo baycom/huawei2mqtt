@@ -16,7 +16,7 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions)
 
-var GWSerialNumber=[];
+var HuaweiSerialNumber=[];
 var modbusClient = new ModbusRTU();
 
 modbusClient.setTimeout(1000);
@@ -44,7 +44,7 @@ if(options.inverterhost) {
 }
 
 var MQTTclient = mqtt.connect("mqtt://"+options.mqtthost,{clientId: options.mqttclientid});
-	MQTTclient.on("connect",function(){	
+	MQTTclient.on("connect",function(){
 	console.log("MQTT connected");
 })
 
@@ -60,7 +60,7 @@ function sendMqtt(id, data) {
         MQTTclient.publish('Huawei/' + id, JSON.stringify(data));        
 }
 
-const ETPayloadParser = new Parser()
+const SUNPayloadParser = new Parser()
 	.uint16be('State1') //32000
 	.seek(2)
 	.uint16be('State2') //32002
@@ -103,21 +103,21 @@ const ETPayloadParser = new Parser()
 	.uint32be('ShutdownTime') //32093
 	.seek((32106-32095)*2)
 	.uint32be('AccumulatedEnergyYield', { formatter: (x) => {return x/100.0;}}) //32106
-	.seek((32114-32108)*2)	
+	.seek((32114-32108)*2)
 	.uint32be('DailyEnergyYield', { formatter: (x) => {return x/100.0;}}) //32114
 	;
-function getETPayload(data) {
-	return ETPayloadParser.parse(data);
+function getSUNPayload(data) {
+	return SUNPayloadParser.parse(data);
 }
 
 
-const getETSN = async (address) => {
+const getSUNSN = async (address) => {
 	try {
 		modbusClient.setID(address);
 		let vals = await modbusClient.readHoldingRegisters(30015, 10);
-		GWSerialNumber[address] = new String(vals.buffer);
+		HuaweiSerialNumber[address] = new String(vals.buffer);
 		if(options.debug) {
-			console.log(GWSerialNumber);
+			console.log(HuaweiSerialNumber);
 		}
 	} catch (e) {
 		if(options.debug) {
@@ -127,15 +127,15 @@ const getETSN = async (address) => {
 	}
 }
 
-const getETRegisters = async (address) => {
+const getSUNRegisters = async (address) => {
 	try {
 		modbusClient.setID(address);
                 let vals = await modbusClient.readHoldingRegisters(32000, 116);	
-		var gwState = getETPayload(vals.buffer);
+		var gwState = getSUNPayload(vals.buffer);
 		if(options.debug) {
 			console.log(util.inspect(gwState));
 		}
-		sendMqtt(GWSerialNumber[address], gwState);
+		sendMqtt(HuaweiSerialNumber[address], gwState);
 	} catch (e) {
 		if(options.debug) {
 			console.log(e);
@@ -154,12 +154,12 @@ const getMetersValue = async (meters) => {
                 if(options.debug) {
                         console.log("query: " + meter);
                 }
-                if(!GWSerialNumber[meter]) {
-			await getETSN(meter);
+                if(!HuaweiSerialNumber[meter]) {
+			await getSUNSN(meter);
                 }
                 await sleep(100);
-                if(GWSerialNumber[meter]) {
-			await getETRegisters(meter);
+                if(HuaweiSerialNumber[meter]) {
+			await getSUNRegisters(meter);
 		}
 		pos++;
         }
