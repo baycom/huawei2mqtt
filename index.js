@@ -115,9 +115,9 @@ const getSUNSN = async (address) => {
 	try {
 		modbusClient.setID(address);
 		let vals = await modbusClient.readHoldingRegisters(30015, 10);
-		HuaweiSerialNumber[address] = new String(vals.buffer);
+		HuaweiSerialNumber[address] = new String(vals.buffer).replace(/\0/g, '');
 		if(options.debug) {
-			console.log(HuaweiSerialNumber);
+			console.log("[" + HuaweiSerialNumber[address] + "]");
 		}
 	} catch (e) {
 		if(options.debug) {
