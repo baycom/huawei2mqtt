@@ -135,7 +135,7 @@ const getETRegisters = async (address) => {
 		if(options.debug) {
 			console.log(util.inspect(gwState));
 		}
-//		sendMqtt(GWSerialNumber[address], gwState);
+		sendMqtt(GWSerialNumber[address], gwState);
 	} catch (e) {
 		if(options.debug) {
 			console.log(e);
