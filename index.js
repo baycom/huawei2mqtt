@@ -3,6 +3,7 @@ var mqtt=require('mqtt');
 var ModbusRTU = require("modbus-serial");
 var Parser = require('binary-parser').Parser;
 const commandLineArgs = require('command-line-args')
+var errorCounter = 0;
 
 const optionDefinitions = [
 	{ name: 'mqtthost', alias: 'm', type: String, defaultValue: "localhost" },
@@ -119,10 +120,12 @@ const getSUNSN = async (address) => {
 		if(options.debug) {
 			console.log("[" + HuaweiSerialNumber[address] + "]");
 		}
+		errorCounter = 0;
 	} catch (e) {
 		if(options.debug) {
 			console.log(e);
 		}
+		errorCounter++;
 		return null;
 	}
 }
@@ -132,14 +135,20 @@ const getSUNRegisters = async (address) => {
 		modbusClient.setID(address);
                 let vals = await modbusClient.readHoldingRegisters(32000, 116);	
 		var gwState = getSUNPayload(vals.buffer);
+		gwState.PV1Power = parseInt(gwState.PV1Voltage * gwState.PV1Current);
+		gwState.PV2Power = parseInt(gwState.PV2Voltage * gwState.PV2Current);
+		gwState.PV3Power = parseInt(gwState.PV3Voltage * gwState.PV3Current);
+		gwState.PV4Power = parseInt(gwState.PV4Voltage * gwState.PV4Current);
 		if(options.debug) {
 			console.log(util.inspect(gwState));
 		}
 		sendMqtt(HuaweiSerialNumber[address], gwState);
+		errorCounter = 0;
 	} catch (e) {
 		if(options.debug) {
 			console.log(e);
 		}
+		errorCounter++;
 		return null;
 	}
 }
@@ -162,6 +171,10 @@ const getMetersValue = async (meters) => {
 			await getSUNRegisters(meter);
 		}
 		pos++;
+        }
+        if(errorCounter>30) {
+        	console.log("too many errors - exiting");
+        	process.exit(-1);
         }
 	await sleep(options.wait);
     } catch(e){
