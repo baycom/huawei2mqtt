@@ -90,9 +90,9 @@ const SUNPayloadParser = new Parser()
 	.int32be('L1Current', { formatter: (x) => {return x/1000.0;}}) //32072
 	.int32be('L2Current', { formatter: (x) => {return x/1000.0;}}) //32074
 	.int32be('L3Current', { formatter: (x) => {return x/1000.0;}}) //32076
-	.int32be('PeakActivePowerDay', { formatter: (x) => {return x/1000.0;}}) //32078
-	.int32be('ActivePower', { formatter: (x) => {return x/1000.0;}}) //32080
-	.int32be('ReactivePower', { formatter: (x) => {return x/1000.0;}}) //32082
+	.int32be('PeakActivePowerDay') //32078
+	.int32be('ActivePower') //32080
+	.int32be('ReactivePower') //32082
 	.int16be('PowerFactor', { formatter: (x) => {return x/1000.0;}}) //32084
 	.uint16be('GridFrequency', { formatter: (x) => {return x/100.0;}}) //32085
 	.uint16be('Efficiency', { formatter: (x) => {return x/100.0;}}) //32086
