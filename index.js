@@ -23,7 +23,7 @@ var modbusClient = new ModbusRTU();
 modbusClient.setTimeout(1000);
 
 if(options.inverterhost) {
-	modbusClient.connectTCP(options.inverterhost, { port: 502 }).catch((error) => {
+	modbusClient.connectTcpRTUBuffered(options.inverterhost, { port: 502 }).catch((error) => {
 		console.error(error);
 		process.exit(-1);
 	});
