@@ -58,7 +58,7 @@ function sendMqtt(id, data) {
         if(options.debug) {
 	        console.log("publish: "+'Huawei/' + id, JSON.stringify(data));
 	}
-        MQTTclient.publish('Huawei/' + id, JSON.stringify(data));        
+        MQTTclient.publish('Huawei/' + id, JSON.stringify(data), { retain: true });
 }
 
 const SUNPayloadParser = new Parser()
